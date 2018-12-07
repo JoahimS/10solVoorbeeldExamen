@@ -175,3 +175,19 @@ In VergaderruimteTest:
 	- Reserveer_DatumLigtNietInDeToekomst_WerptArgumentException()
 
 
+##   Puntenverdeling
+  
+<span style='color:red'>Een solution waarvan de code compilatie fouten bevat wordt niet verder geëvalueerd en hiervoor krijg je dus 0/100.</span>
+
+Als de applicatie compileert :
+
+* Mapper: 10 punten
+* Repository en configuratie: 10 punten
+* Domein: 20 punten
+* Controller: 20 punten
+* Authorisatie: 6 punten
+* Views: 14 punten
+* Client – Validatie: 10 punten
+* Unit testen: 10 punten
+ 
+
