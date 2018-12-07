@@ -81,9 +81,12 @@ namespace ThePlaceToMeet.Tests.Controllers
         #endregion
 
         #region Reserveer HttpGet
-        [Fact(Skip = "Not yet implemented")]
+        [Fact]
         public void ReserveerGet_GeeftReservatieViewModelDoorAanView()
         {
+            _vergaderruimteRepository.Setup(v => v.GetById(1)).Returns(_context.Vergaderruimte);
+            var actionResult = _controller.Reserveer(1) as ViewResult;
+            Assert.IsType<ReservatieViewModel>(actionResult?.Model);
         }
         #endregion
 
@@ -119,9 +122,16 @@ namespace ThePlaceToMeet.Tests.Controllers
             Assert.Equal(_context.Peter.Reservaties.Last(), result?.Model);
         }
 
-        [Fact(Skip = "Not yet implemented")]
+        [Fact]
         public void ReserveerPost_OngeldigeModelState_RetourneertDefaultView()
         {
+            _controller.ModelState.AddModelError("any key", "any error");
+            _cateringRepository.Setup(b => b.GetBy(3)).Returns(_context.CateringSushi);
+            _vergaderruimteRepository.Setup(v => v.GetById(1)).Returns(_context.Vergaderruimte);
+            ViewResult result = _controller.Reserveer(1, model, _context.Peter) as ViewResult;
+            Assert.Null(result?.ViewName);
+            Assert.Equal(model, result?.Model);
+
         }
 
         [Fact]
