@@ -12,6 +12,11 @@ using Microsoft.EntityFrameworkCore;
 using ThePlaceToMeet.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ThePlaceToMeet.Models.Domain;
+using ThePlaceToMeet.Services;
+using System.Security.Claims;
+using ThePlaceToMeet.Filters;
+using ThePlaceToMeet.Data.Repositories;
 
 namespace ThePlaceToMeet
 {
@@ -37,14 +42,23 @@ namespace ThePlaceToMeet
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+            services.AddAuthorization(options => {
+                options.AddPolicy("Klant", policy => policy.RequireClaim(ClaimTypes.Role, "klant"));
+            });
 
+            // Add application services.
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.AddScoped<IKlantRepository, KlantRepository>();
+            services.AddScoped<ApplicationDataInitializer>();
+            services.AddScoped<KlantFilter>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDataInitializer initializer)
         {
             if (env.IsDevelopment())
             {
@@ -69,6 +83,9 @@ namespace ThePlaceToMeet
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            initializer.InitializeData().Wait();
+
         }
     }
 }
