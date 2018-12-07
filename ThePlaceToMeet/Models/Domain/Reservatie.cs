@@ -15,12 +15,8 @@ namespace ThePlaceToMeet.Models.Domain
         public decimal PrijsPerPersoonCatering { get; set; } //prijs voor de catering per persoon op het moment van de reservatie, indien voorzien, anders 0. 
         public Catering Catering { get; set; }
         public Korting Korting { get; set; }
-        public decimal TotalePrijs
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        public decimal TotalePrijs =>
+          PrijsPerUur * DuurInUren * (1 - (Korting != null ? (decimal)Korting.Percentage / 100 : 0)) + ((PrijsPerPersoonStandaardCatering + PrijsPerPersoonCatering) * AantalPersonen);
+
     }
 }
