@@ -47,7 +47,25 @@ namespace ThePlaceToMeet.Controllers
         [ServiceFilter(typeof(KlantFilter))]
         public IActionResult Reserveer(int id, ReservatieViewModel viewmodel, Klant klant)
         {
-            throw new NotImplementedException();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    Catering catering = viewmodel.CateringId != 0 ? _cateringRepository.GetBy(viewmodel.CateringId) : null;
+                    Vergaderruimte ruimte = _vergaderruimteRepository.GetById(id);
+                    Reservatie reservatie = ruimte.Reserveer(klant, _kortingRepository.GetAll(), viewmodel.Dag, viewmodel.BeginUur, viewmodel.Duur, viewmodel.AantalPersonen, catering, viewmodel.StandaardCatering);
+                    _vergaderruimteRepository.SaveChanges();
+                    return View("Bevestiging", reservatie);
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", ex.Message);
+                }
+            }
+            ViewData["catering"] = new SelectList(_cateringRepository.GetAll().OrderBy(c => c.Titel), nameof(Catering.Id), nameof(Catering.Titel));
+            return View(viewmodel);
+
         }
     }
 }
